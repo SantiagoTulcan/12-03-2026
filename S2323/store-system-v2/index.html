@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StorePro — Procurement & Order Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="public/css/styles.css" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">◈</div>
+    <div>
+      <div class="logo-text">StorePro</div>
+      <div class="logo-version">v2.0 — Procurement Suite</div>
+    </div>
+  </div>
+
+  <div class="role-switcher">
+    <label class="role-label">Active Role</label>
+    <select id="roleSelect" class="role-select">
+      <option value="SHIPPING_OFFICE">📦 Shipping Office</option>
+      <option value="BUYER_AGENT">🛒 Buyer Agent</option>
+      <option value="SUPERVISOR">👔 Supervisor</option>
+      <option value="SELLER">🏪 Seller</option>
+      <option value="RECEIVE_AGENT">📬 Receive Agent</option>
+    </select>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-item active" data-view="dashboard">
+      <span class="nav-icon">⊞</span> Dashboard
+    </button>
+    <button class="nav-item" data-view="requisitions">
+      <span class="nav-icon">📋</span> Requisitions
+    </button>
+    <button class="nav-item" data-view="quotes">
+      <span class="nav-icon">💬</span> Quotes
+    </button>
+    <button class="nav-item" data-view="orders">
+      <span class="nav-icon">📦</span> Orders
+    </button>
+    <button class="nav-item" data-view="workflow">
+      <span class="nav-icon">⟳</span> Workflow
+    </button>
+    <button class="nav-item" data-view="editor">
+      <span class="nav-icon">&lt;/&gt;</span> Code Editor
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">👤</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebarUserName">Shipping Officer</div>
+        <div class="user-role-tag" id="sidebarUserRole">shipping@store.com</div>
+      </div>
+    </div>
+    <button class="btn-clear" id="clearDataBtn">⚠ Clear Demo Data</button>
+  </div>
+</aside>
+
+<!-- ════════════════════════════════════════════════
+     MAIN CONTENT
+════════════════════════════════════════════════ -->
+<main class="main-content">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1 class="page-title" id="pageTitle">Dashboard</h1>
+      <span class="page-subtitle" id="pageSubtitle">Overview of procurement activity</span>
+    </div>
+    <div class="topbar-right">
+      <div class="status-badge" id="currentRole">Shipping Office</div>
+      <div class="notification-dot"></div>
+    </div>
+  </header>
+
+  <!-- ── VIEW: DASHBOARD ── -->
+  <section class="view active" id="view-dashboard">
+    <div class="stats-grid" id="statsGrid">
+      <!-- populated by JS -->
+    </div>
+    <div class="grid-2col">
+      <div class="card">
+        <h3 class="card-title">Recent Requisitions</h3>
+        <div id="recentRequisitions" class="list-items"></div>
+      </div>
+      <div class="card">
+        <h3 class="card-title">Workflow Status</h3>
+        <div class="workflow-mini" id="workflowMini"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VIEW: REQUISITIONS ── -->
+  <section class="view" id="view-requisitions">
+    <div class="toolbar">
+      <button class="btn btn-primary" id="newRequisitionBtn">+ New Requisition</button>
+      <input class="search-input" type="text" placeholder="Search requisitions…" id="searchRequisitions" />
+    </div>
+
+    <div class="form-panel" id="requisitionForm" style="display:none">
+      <h3 class="form-title">Create New Requisition</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="reqTitle" class="input" placeholder="e.g. Office Supplies Q1" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="reqDesc" class="input" rows="3" placeholder="Describe the requisition…"></textarea>
+        </div>
+      </div>
+
+      <div class="product-section">
+        <div class="product-header">
+          <h4>Products</h4>
+          <button class="btn btn-sm" id="addProductBtn">+ Add Product</button>
+        </div>
+        <div id="productsList"></div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-ghost" id="cancelReqBtn">Cancel</button>
+        <button class="btn btn-primary" id="submitReqBtn">Submit Requisition</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table" id="requisitionsTable">
+        <thead>
+          <tr>
+            <th>ID</th><th>Title</th><th>Status</th><th>Products</th><th>Total</th><th>Date</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="requisitionsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── VIEW: QUOTES ── -->
+  <section class="view" id="view-quotes">
+    <div class="toolbar">
+      <button class="btn btn-primary" id="newQuoteBtn">+ Create Quote</button>
+    </div>
+
+    <div class="form-panel" id="quoteForm" style="display:none">
+      <h3 class="form-title">Create Quote for Request</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Linked Requisition</label>
+          <select id="quotePedidoSelect" class="input"></select>
+        </div>
+        <div class="form-group">
+          <label>Quote Price ($)</label>
+          <input type="number" id="quotePrice" class="input" placeholder="0.00" step="0.01" />
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Description & Terms</label>
+          <textarea id="quoteDesc" class="input" rows="3" placeholder="Describe pricing, delivery terms, conditions…"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" id="cancelQuoteBtn">Cancel</button>
+        <button class="btn btn-primary" id="submitQuoteBtn">Submit Quote</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Quote ID</th><th>Requisition</th><th>Price</th><th>Status</th><th>Notes</th><th>Date</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="quotesBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── VIEW: ORDERS ── -->
+  <section class="view" id="view-orders">
+    <div class="toolbar">
+      <button class="btn btn-primary" id="createOrderBtn">+ Create Order from Quote</button>
+    </div>
+
+    <div class="form-panel" id="orderForm" style="display:none">
+      <h3 class="form-title">Create Order</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Select Accepted Quote</label>
+          <select id="orderQuoteSelect" class="input"></select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" id="cancelOrderBtn">Cancel</button>
+        <button class="btn btn-primary" id="submitOrderBtn">Create Order</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Order ID</th><th>Requisition</th><th>Total</th><th>Status</th><th>Invoice</th><th>Payment</th><th>Date</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── VIEW: WORKFLOW ── -->
+  <section class="view" id="view-workflow">
+    <div class="workflow-container">
+      <h3 class="section-heading">Procurement Workflow — Live Status</h3>
+      <div class="flow-diagram" id="flowDiagram"></div>
+
+      <div class="workflow-legend">
+        <div class="legend-item"><span class="legend-dot done"></span>Completed</div>
+        <div class="legend-item"><span class="legend-dot active"></span>In Progress</div>
+        <div class="legend-item"><span class="legend-dot pending"></span>Pending</div>
+        <div class="legend-item"><span class="legend-dot rejected"></span>Rejected</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VIEW: CODE EDITOR ── -->
+  <section class="view" id="view-editor">
+    <div class="editor-layout">
+      <div class="editor-sidebar">
+        <div class="editor-sidebar-title">Project Files</div>
+        <div class="file-tree" id="fileTree"></div>
+      </div>
+      <div class="editor-main">
+        <div class="editor-tabs" id="editorTabs"></div>
+        <div class="editor-toolbar">
+          <span class="editor-file-name" id="editorFileName">index.ts</span>
+          <div class="editor-actions">
+            <button class="btn btn-sm" id="copyCodeBtn">Copy</button>
+            <button class="btn btn-sm btn-primary" id="formatCodeBtn">Format</button>
+          </div>
+        </div>
+        <div class="code-editor-wrapper">
+          <div class="line-numbers" id="lineNumbers"></div>
+          <textarea class="code-editor" id="codeEditor" spellcheck="false"></textarea>
+        </div>
+        <div class="editor-statusbar">
+          <span id="cursorPos">Ln 1, Col 1</span>
+          <span>TypeScript</span>
+          <span>UTF-8</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" style="display:none">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Action Required</h3>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="public/js/app.js"></script>
+<script>
+  // Update sidebar user info on role change
+  const origRoleHandler = document.getElementById('roleSelect');
+  origRoleHandler.addEventListener('change', (e) => {
+    const names = {
+      'SHIPPING_OFFICE': ['Shipping Officer','shipping@store.com'],
+      'BUYER_AGENT':     ['Buyer Agent','buyer@store.com'],
+      'SUPERVISOR':      ['Supervisor','supervisor@store.com'],
+      'SELLER':          ['Seller','seller@store.com'],
+      'RECEIVE_AGENT':   ['Receive Agent','receive@store.com']
+    };
+    const [name, email] = names[e.target.value] || ['User','user@store.com'];
+    document.getElementById('sidebarUserName').textContent = name;
+    document.getElementById('sidebarUserRole').textContent = email;
+  });
+</script>
+</body>
+</html>
